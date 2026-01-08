@@ -22,6 +22,24 @@ app.get("/", (req,res)=>{
     res.render("index");
 });
 
+app.post("/create", async (req,res)=>{
+    let {name, username, email, age, password} = req.body;
+    let user = await userModel.findOne({email});
+    if(user) return res.status(500).send("User already exists, please login");
+    
+    bcrypt.genSalt(10, (err, salt)=>{
+        bcrypt.hash(password, salt, async (err, hash)=>{
+            let user =  await userModel.create({
+                name,
+                 username, 
+                 email,
+                 age,
+                 password : hash       
+            });
+        });
+    });
+});
+
 
 app.listen(PORT, ()=>{
     console.log(`server is running in http://localhost:${PORT}`)
