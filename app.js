@@ -58,8 +58,8 @@ app.post("/login", async (req, res)=>{
     bcrypt.compare(password, user.password, function(err, result){
         let token = jwt.sign({email : email, userid : user._id}, "secret");
         res.cookie("token", token);
-        if(result)  return res.status(200).send("you can login");
-        else res.redirect("/login");
+        if(result)  return res.status(200).redirect("/profile");
+        else res.send("credentials doesnot match!");
     })
 });
 
@@ -70,14 +70,16 @@ app.get("/logout", (req, res)=>{
 });
 
 
-app.get("/profile",isLoggedIn, (req,res)=>{
-    res.send(req.user);
+app.get("/profile",isLoggedIn, async (req,res)=>{
+    let user = await userModel.findOne({email : req.user.email});
+    console.log(user);
+    res.render("profile", {user});
 });
 
 
 
 function isLoggedIn(req, res, next){
-    if(req.cookies.token === "") res.send("You must be logged in");
+    if(req.cookies.token === "") res.redirect("/login");
     else{
         let data = jwt.verify(req.cookies.token, "secret");
         req.user = data;
