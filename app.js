@@ -36,9 +36,54 @@ app.post("/create", async (req,res)=>{
                  age,
                  password : hash       
             });
+
+            let token = jwt.sign({email : email, userid : user._id}, "secret");
+            res.cookie("token", token);
+            res.send("registered");
         });
     });
 });
+
+app.get("/login", (req,res)=>{
+    res.render("login");
+})
+
+
+app.post("/login", async (req, res)=>{
+    let {email, password} = req.body;
+
+    let user = await userModel.findOne({email});
+    if(!user) return res.status(500).send("something went wrong");
+
+    bcrypt.compare(password, user.password, function(err, result){
+        let token = jwt.sign({email : email, userid : user._id}, "secret");
+        res.cookie("token", token);
+        if(result)  return res.status(200).send("you can login");
+        else res.redirect("/login");
+    })
+});
+
+
+app.get("/logout", (req, res)=>{
+     res.cookie("token", "");
+     res.redirect("/login");
+});
+
+
+app.get("/profile",isLoggedIn, (req,res)=>{
+    res.send(req.user);
+});
+
+
+
+function isLoggedIn(req, res, next){
+    if(req.cookies.token === "") res.send("You must be logged in");
+    else{
+        let data = jwt.verify(req.cookies.token, "secret");
+        req.user = data;
+        next();
+    }
+}
 
 
 app.listen(PORT, ()=>{
