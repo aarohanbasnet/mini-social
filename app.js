@@ -105,7 +105,7 @@ app.get("/like/:postid", isLoggedIn, async (req,res)=>{
 });
 
 app.post("/update/:id", isLoggedIn, async(req,res)=>{
-    let post = await postModel.findOneAndUpdate({_id : req.params.id}, {content : req.params.content});
+    let post = await postModel.findOneAndUpdate({_id : req.params.id}, {content : req.body.content});
     res.redirect("/profile");
 })
 
