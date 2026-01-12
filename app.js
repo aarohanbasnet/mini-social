@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const cookieParser = require("cookie-parser");
 const path = require('path');
+const multerconfig = requie('./config/multerconfig');
 
 
 const PORT = 3000;
