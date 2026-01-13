@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const cookieParser = require("cookie-parser");
 const path = require('path');
-const multerconfig = requie('./config/multerconfig');
+const multerconfig = require('./config/multerconfig');
 
 
 const PORT = 3000;
@@ -16,6 +16,7 @@ app.set("view engine", "ejs")
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
 
 
