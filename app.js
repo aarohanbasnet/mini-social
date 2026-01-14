@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const cookieParser = require("cookie-parser");
 const path = require('path');
-const multerconfig = require('./config/multerconfig');
+const upload = require('./config/multerconfig');
 
 
 const PORT = 3000;
@@ -75,6 +75,7 @@ app.get("/logout", (req, res)=>{
 app.get("/profile",isLoggedIn, async (req,res)=>{
     let user = await userModel.findOne({email : req.user.email}).populate("posts");
     res.render("profile", {user});
+    console.log(user.profilepic);
 });
 
 app.post("/post",isLoggedIn, async(req,res)=>{
@@ -109,12 +110,23 @@ app.get("/like/:postid", isLoggedIn, async (req,res)=>{
 app.post("/update/:id", isLoggedIn, async(req,res)=>{
     let post = await postModel.findOneAndUpdate({_id : req.params.id}, {content : req.body.content});
     res.redirect("/profile");
-})
+});
 
 
 app.get("/edit/:id", isLoggedIn, async (req,res)=>{
     let post = await postModel.findOne({_id : req.params.id}).populate("user");
     res.render("edit", {post});
+});
+
+app.get("/profile/upload", isLoggedIn, (req,res)=>{
+    res.render("uploadpic");
+});
+
+app.post("/upload", isLoggedIn, upload.single("image"), async (req,res)=>{
+ let user = await userModel.findOne({email : req.user.email});
+ user.profilepic = req.file.filename;
+ await user.save();
+ res.redirect("/profile");
 })
 
 
